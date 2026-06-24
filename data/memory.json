@@ -1,0 +1,62 @@
+[
+  {
+    "department": "Technical Support",
+    "query": "Pipeline not starting after runner reboot",
+    "resolution": "Runner service did not restart automatically after host reboot. Customer enabled auto-restart with `systemctl enable novapulse-runner` and confirmed service starts on boot. Consider setting `restart: always` in docker-compose if running runner in Docker."
+  },
+  {
+    "department": "Technical Support",
+    "query": "How do I debug a pipeline that passes locally but fails in NovaPulse?",
+    "resolution": "Key differences between local and NovaPulse environments: (1) NovaPulse runs in a clean container — no local state. (2) Environment variables must be explicitly declared in novapulse.yml or Secrets. (3) File permissions may differ. Use `run: env` as an early step to dump the environment and compare with local. Use `run: ls -la` to verify file presence and permissions."
+  },
+  {
+    "department": "Billing & Payments",
+    "query": "Why did my bill go up this month even though I didn't change my plan?",
+    "resolution": "Common causes: (1) New team member added — seats are billed on high-water-mark. (2) Compute overage from increased pipeline runs. (3) Add-on expiry — overage rate kicks in. Directed customer to Billing > Usage Breakdown for itemized view. Recommended enabling usage alerts."
+  },
+  {
+    "department": "Technical Support",
+    "query": "Deployment health check failing even though the app is running",
+    "resolution": "NovaPulse health checks default to HTTP GET on port 8080 at `/health`. If the app uses a different port or path, update health check config in Project > Environments > Health Check Settings. Common fix: set `health_check.path: /api/health` and `health_check.port: 3000`."
+  },
+  {
+    "department": "Technical Support",
+    "query": "How do I speed up my Node.js builds?",
+    "resolution": "Top optimisations for Node.js in NovaPulse: (1) Cache `node_modules/` — add `cache.paths: [node_modules/]` with `cache.key: node-${{ checksum('package-lock.json') }}`. (2) Use `npm ci` instead of `npm install` for reproducibility and speed. (3) Run tests in parallel using Jest's `--maxWorkers` flag. (4) Consider switching to `pnpm` — typically 2–3x faster installs."
+  },
+  {
+    "department": "Returns & Refunds",
+    "query": "I cancelled but was still charged next month",
+    "resolution": "Cancellation was submitted after the billing cutoff time (23:59 UTC on the last day of the cycle). The charge was for the next cycle that had already been invoiced. Issued a full refund as a courtesy since the cancellation was submitted within 48 hours of the charge. Recommended customers cancel at least 3 days before cycle end."
+  },
+  {
+    "department": "Technical Support",
+    "query": "Can I trigger a pipeline manually without a code push?",
+    "resolution": "Yes — use the 'Run Pipeline' button on the Pipelines page, or the NovaPulse CLI: `novapulse pipeline run --branch main --env production`. You can also trigger via API: POST to `/v1/projects/{project_id}/pipelines/trigger` with a bearer token. Manual runs do not count toward the webhook-triggered run quota."
+  },
+  {
+    "department": "General Inquiry",
+    "query": "Do you support on-premise deployment of NovaPulse?",
+    "resolution": "NovaPulse does not offer a fully self-hosted on-premise option. However, Enterprise customers can get a dedicated single-tenant deployment in a private cloud region. Self-hosted runners can be used to keep compute within the customer's own infrastructure. For air-gapped environments, contact enterprise@novapulse.io — a hybrid model may be feasible."
+  },
+  {
+    "department": "Technical Support",
+    "query": "Pipeline is flaky — passes sometimes and fails sometimes with no code changes",
+    "resolution": "Flaky pipelines are usually caused by: (1) Race conditions in tests — use proper async/await or test timeouts. (2) Dependency on external services — mock unstable third-party APIs. (3) Timing-sensitive tests — add retries with `retry.max_attempts: 2` in novapulse.yml. (4) Shared test state — ensure test database is reset between runs. Enabled 'Flakiness Detection' in project settings to automatically identify and quarantine flaky tests."
+  },
+  {
+    "department": "Billing & Payments",
+    "query": "Can we get a discount for paying annually?",
+    "resolution": "Annual plans include a 20% discount over monthly pricing. For teams of 25+ seats, an additional 10% volume discount is available. Discounts are applied at checkout when switching to annual billing under Settings > Billing > Change Plan. Enterprise customers can negotiate custom pricing including multi-year discounts — contact sales@novapulse.io."
+  },
+  {
+    "department": "Technical Support",
+    "query": "How do I set up notifications for pipeline failures?",
+    "resolution": "Go to Project > Settings > Notifications. You can configure: (1) Email — sends to all project members or specific addresses. (2) Slack — connect via OAuth and select a channel. (3) PagerDuty — for on-call alerting on production pipeline failures. (4) Webhooks — POST to any URL with a configurable JSON payload. Notification rules can be scoped to specific branches (e.g., only alert on `main` failures)."
+  },
+  {
+    "department": "Technical Support",
+    "query": "My team can't see the production environment — it says 'access restricted'",
+    "resolution": "Production environment access is controlled separately from project access. A project Owner or Admin must grant environment-level access under Project > Environments > Production > Access Control. Recommended: create an 'Ops' team with production access and a 'Dev' team with dev/staging access only. Role changes take effect immediately."
+  }
+]

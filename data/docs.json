@@ -1,0 +1,62 @@
+[
+  {
+    "department": "Billing & Payments",
+    "doc_type": "policy",
+    "title": "Refund & Cancellation Policy",
+    "content": "NovaPulse offers the following refund terms:\n\n**Monthly Plans:** Non-refundable for the current billing cycle. Cancellation takes effect at the end of the period. No further charges are made after cancellation is confirmed.\n\n**Annual Plans:** Eligible for a prorated refund for unused full months, minus a 10% administration fee. Partial months are not refunded. Refund requests must be submitted within 14 days of cancellation.\n\n**Free Trial Conversions:** If you are charged immediately after a free trial and did not intend to convert, contact billing@novapulse.io within 7 days for a full refund — no questions asked.\n\n**Disputed Charges:** All charge disputes must be raised within 60 days of the billing date. Submit disputes to billing@novapulse.io with your account ID and the transaction reference. NovaPulse will respond within 3 business days.\n\n**Service Credits:** In the event of an SLA breach, credits are applied to the following invoice and cannot be exchanged for cash."
+  },
+  {
+    "department": "Billing & Payments",
+    "doc_type": "policy",
+    "title": "Plan Upgrade & Downgrade Policy",
+    "content": "**Upgrading:** Plan upgrades take effect immediately. You are charged a prorated amount for the remainder of the current billing cycle at the new plan rate. The full new plan rate applies from the next billing cycle.\n\n**Downgrading:** Downgrades are scheduled for the next billing cycle. You retain access to current plan features until the cycle ends. If your current usage (seats, compute minutes, projects) exceeds the limits of the downgraded plan, you must reduce usage before the downgrade takes effect or it will be blocked.\n\n**Add-ons:** Compute minute add-ons are purchased in blocks and are non-refundable. Unused add-on minutes roll over for one billing cycle only.\n\n**Enterprise Contracts:** Plan changes within enterprise contracts must be negotiated with your Customer Success Manager and may require a contract amendment."
+  },
+  {
+    "department": "Technical Support",
+    "doc_type": "guide",
+    "title": "NovaPulse Agent Installation Guide",
+    "content": "The NovaPulse Agent enables cluster metrics, log ingestion, and drift detection for Kubernetes environments.\n\n**Prerequisites:**\n- Kubernetes 1.22 or later\n- Helm 3.x installed\n- Outbound HTTPS access to `ingest.novapulse.io:443`\n- An API key from Settings > API Keys\n\n**Installation:**\n```bash\nhelm repo add novapulse https://charts.novapulse.io\nhelm repo update\nhelm install novapulse-agent novapulse/agent \\\n  --namespace monitoring \\\n  --create-namespace \\\n  --set apiKey=<YOUR_API_KEY> \\\n  --set cluster.name=<YOUR_CLUSTER_NAME>\n```\n\n**Verification:**\nCheck that the agent pod is running:\n```bash\nkubectl get pods -n monitoring -l app=novapulse-agent\n```\nMetrics appear on the NovaPulse dashboard within 5–10 minutes.\n\n**Uninstallation:**\n```bash\nhelm uninstall novapulse-agent -n monitoring\n```\nRemoving the agent stops metric ingestion but does not delete historical data from NovaPulse."
+  },
+  {
+    "department": "Technical Support",
+    "doc_type": "guide",
+    "title": "Pipeline Configuration Reference (novapulse.yml)",
+    "content": "The `novapulse.yml` file at the root of your repository defines your CI/CD pipeline.\n\n**Minimal example:**\n```yaml\nversion: '1'\npipeline:\n  stages:\n    - name: build\n      image: node:20\n      steps:\n        - run: npm ci\n        - run: npm run build\n    - name: deploy\n      image: novapulse/cli:latest\n      steps:\n        - run: novapulse deploy --env production\n```\n\n**Key fields:**\n- `job_timeout_minutes` (default: 30): Max runtime per job before it is killed.\n- `resources.memory` (default: 2048 MB): Memory limit per job in MB.\n- `resources.cpu` (default: 2): CPU cores allocated per job.\n- `environment`: Map of environment variables (use `${{ secrets.KEY }}` for secrets).\n- `cache.paths`: List of paths to cache between runs (e.g., `node_modules/`, `.gradle/`).\n- `on.push.branches`: List of branches that trigger the pipeline on push.\n- `on.pull_request`: Set to `true` to trigger on all PRs.\n\n**Parallelism:**\nStages run sequentially by default. Add `parallel: true` to a stage to run its jobs concurrently."
+  },
+  {
+    "department": "General Inquiry",
+    "doc_type": "policy",
+    "title": "Data Retention & Deletion Policy",
+    "content": "NovaPulse retains customer data according to the following schedule:\n\n**Active Accounts:**\n- Pipeline logs: 90 days (Pro/Growth), 1 year (Enterprise, configurable)\n- Deployment artifacts: last 10 runs (configurable up to 50)\n- Audit logs: 1 year on all paid plans\n- Metrics & traces: 30 days (Growth), 90 days (Pro), 1 year (Enterprise)\n\n**Post-Cancellation:**\n- All data is retained for 30 days after cancellation to allow export.\n- After 30 days, data is permanently and irreversibly deleted from all systems including backups.\n- Customers can request immediate deletion by emailing privacy@novapulse.io.\n\n**Data Export:**\nExport your data at any time from Settings > Data & Privacy > Export. Exports are generated as a ZIP archive containing JSON files for all your pipeline configs, logs, and settings. Export jobs run asynchronously and you will receive an email with a download link when ready.\n\n**GDPR Requests:**\nData subject access requests and right-to-erasure requests are processed within 30 days. Submit requests to privacy@novapulse.io."
+  },
+  {
+    "department": "General Inquiry",
+    "doc_type": "policy",
+    "title": "Security & Compliance Overview",
+    "content": "NovaPulse is built on a security-first foundation.\n\n**Certifications:**\n- SOC 2 Type II (audited annually)\n- ISO 27001\n- GDPR Compliant\n- HIPAA BAA available on Enterprise plan\n\n**Infrastructure Security:**\n- All data encrypted in transit (TLS 1.2+) and at rest (AES-256)\n- Secrets management via HashiCorp Vault\n- Network isolation via VPCs with no public inbound except load balancers\n- Penetration testing performed quarterly by a third-party firm\n\n**Access Controls:**\n- Role-based access control (RBAC) at project and organization level\n- SSO via SAML 2.0 and OIDC (Enterprise)\n- MFA enforced for all admin roles\n- API keys are scoped and rotatable\n\n**Incident Response:**\n- 24/7 security monitoring via SIEM\n- Incident response SLA: P0 incidents acknowledged within 15 minutes\n- Customers notified of security incidents affecting their data within 72 hours per GDPR requirements\n\n**Bug Bounty:**\nReport vulnerabilities at security@novapulse.io. We offer bounties up to $10,000 for critical findings."
+  },
+  {
+    "department": "Technical Support",
+    "doc_type": "guide",
+    "title": "Secrets Management Best Practices",
+    "content": "NovaPulse provides a built-in secrets manager to securely handle credentials, API keys, and tokens.\n\n**Storing Secrets:**\nNavigate to Project > Settings > Secrets > New Secret. Secrets are encrypted using AES-256 before storage. NovaPulse staff cannot view secret values.\n\n**Using Secrets in Pipelines:**\nReference secrets in `novapulse.yml` using the `${{ secrets.KEY_NAME }}` syntax:\n```yaml\nsteps:\n  - run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}\n```\nSecrets are masked in pipeline logs — if a secret value appears in output, it is replaced with `***`.\n\n**Best Practices:**\n- Rotate secrets regularly — NovaPulse will alert you if a secret has not been rotated in 90 days.\n- Use environment-scoped secrets: don't share production credentials with development environments.\n- Never hardcode secrets in `novapulse.yml` — even in private repositories.\n- Audit secret access under Settings > Audit Log, filtering by resource type 'Secret'.\n\n**Secret Rotation:**\nTo rotate a secret, create the new version first, update all dependent jobs, then delete the old secret. Pipelines referencing a deleted secret will fail at the secret-injection step."
+  },
+  {
+    "department": "Order Tracking",
+    "doc_type": "policy",
+    "title": "Enterprise Onboarding & Contract Process",
+    "content": "Enterprise customers follow a structured onboarding process:\n\n**Sales to Contract (Week 1–2):**\n- Discovery call with a Solutions Engineer to define requirements\n- Custom quote generated based on seats, compute, and support tier\n- MSA and Order Form sent via DocuSign\n- Payment terms: Net 30 by default; Net 60 available for customers with 500+ seats\n\n**Technical Onboarding (Week 2–4):**\n- Dedicated Customer Success Manager assigned\n- SSO/SAML configuration with your identity provider\n- Private deployment or dedicated tenant setup if contracted\n- Kickoff call to configure first integration and pipeline\n\n**Ongoing:**\n- Quarterly Business Reviews (QBRs) with your CSM\n- 24/7 P0 support via dedicated Slack channel\n- Renewal proposal sent 60 days before contract end\n- Contract amendments processed within 5 business days\n\n**Escalations:**\nFor contract or billing escalations, email enterprise@novapulse.io with 'ESCALATION' in the subject line for priority handling."
+  },
+  {
+    "department": "Technical Support",
+    "doc_type": "guide",
+    "title": "Troubleshooting Failed Deployments",
+    "content": "This guide covers the most common deployment failure scenarios and how to resolve them.\n\n**1. Image Pull Errors (`ErrImagePull` / `ImagePullBackOff`):**\n- Verify the image name and tag are correct.\n- Ensure your container registry credentials are stored as secrets and referenced in `image_pull_secrets`.\n- Check that the registry is accessible from the deployment region.\n\n**2. Insufficient Resources:**\n- Symptoms: pods stuck in `Pending` state.\n- Fix: Increase `resources.memory` and `resources.cpu` in `novapulse.yml`, or scale up your runner/cluster.\n\n**3. Health Check Failures:**\n- NovaPulse waits up to `deploy_timeout_minutes` (default: 10) for health checks to pass.\n- Verify your application starts within that window.\n- Check application logs: Deployments > select run > Logs.\n\n**4. Environment Variable Errors:**\n- Missing or misspelled secrets cause a `SecretNotFound` error at pipeline start.\n- Audit your secrets under Project > Settings > Secrets.\n\n**5. Rollback:**\n- If a deployment fails post-health-check, NovaPulse automatically rolls back to the last successful deployment.\n- You can also trigger a manual rollback from Deployments > select target > Redeploy."
+  },
+  {
+    "department": "Billing & Payments",
+    "doc_type": "guide",
+    "title": "Understanding Your NovaPulse Invoice",
+    "content": "NovaPulse invoices are itemized to show exactly what you are being charged for.\n\n**Invoice Sections:**\n\n1. **Base Plan:** Your monthly or annual plan fee, prorated if you upgraded or downgraded mid-cycle.\n\n2. **Seat Charges:** Per-seat fees for additional team members beyond your plan's included seats. Seats are counted on a high-water-mark basis — the maximum number of active seats at any point during the billing period.\n\n3. **Compute Overage:** Charges for compute minutes beyond your plan's included allocation. Rate: $0.008 per minute (Linux x86), $0.016 per minute (Linux ARM or Windows).\n\n4. **Add-ons:** Any purchased compute blocks, storage add-ons, or support tier upgrades.\n\n5. **Taxes:** Applicable sales tax or VAT based on your billing address.\n\n**Payment Due Date:**\nInvoices are due on the billing date. Failed payments are retried after 3 days, then 7 days. After two failed retries, your account is suspended and pipelines are paused.\n\n**Questions:**\nFor invoice questions, include your invoice number (format: INV-XXXXXX) when contacting billing@novapulse.io."
+  }
+]

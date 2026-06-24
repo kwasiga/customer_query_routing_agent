@@ -1,0 +1,122 @@
+[
+  {
+    "ticket_id": "TKT-1001",
+    "department": "Technical Support",
+    "summary": "Pipeline stuck in pending for 45 minutes — no runner picked it up",
+    "thread": "Customer reported their production deploy pipeline queued at 14:32 UTC and never started. All runners showed as 'Idle' in the UI. Investigation found the runner daemon had crashed after an OOM event on the runner host. Restarting the runner service resolved the issue immediately.",
+    "resolution": "Runner daemon was OOM-killed by the host OS. Customer restarted the runner service with `systemctl restart novapulse-runner`. Recommended increasing runner host RAM from 4 GB to 8 GB to prevent recurrence. Added alert on runner heartbeat loss to their account.",
+    "resolution_type": "configuration_fix"
+  },
+  {
+    "ticket_id": "TKT-1002",
+    "department": "Technical Support",
+    "summary": "Kubernetes cluster metrics showing 0 across all dashboards after cluster upgrade",
+    "thread": "Customer upgraded their EKS cluster from 1.26 to 1.28. After the upgrade, all cluster metrics on the NovaPulse dashboard showed zero. Agent pods were in CrashLoopBackOff state. Logs showed `Error: incompatible API version` — the installed agent version (1.4.2) didn't support the new Kubernetes API.",
+    "resolution": "Upgraded NovaPulse Agent from 1.4.2 to 1.7.0 using `helm upgrade novapulse-agent novapulse/agent --reuse-values --set image.tag=1.7.0`. Metrics resumed within 8 minutes. Documented in customer runbook. Kubernetes 1.28+ requires Agent 1.6.0+.",
+    "resolution_type": "version_upgrade"
+  },
+  {
+    "ticket_id": "TKT-1003",
+    "department": "Billing & Payments",
+    "summary": "Customer charged $847 overage — was unaware compute add-on had expired",
+    "thread": "Customer was on a Growth plan with a 10,000 compute-minute add-on. The add-on expired at the end of the previous month and the customer was not notified. Their pipelines continued running and accrued 105,875 overage minutes at $0.008/min. Customer contacted support disputing the charge.",
+    "resolution": "Confirmed the add-on expiry notification email was sent but went to spam. As a goodwill gesture, issued a 50% credit ($423.50) applied to next invoice. Enabled 'Compute Usage Alerts' on the account at 80% and 100% thresholds. Customer purchased a new add-on.",
+    "resolution_type": "partial_refund"
+  },
+  {
+    "ticket_id": "TKT-1004",
+    "department": "Technical Support",
+    "summary": "GitHub webhook not triggering — pipelines not starting on push",
+    "thread": "Customer reported pushes to their main branch stopped triggering NovaPulse pipelines 3 days ago. Checked GitHub webhook delivery logs — receiving 401 Unauthorized responses from NovaPulse hooks endpoint. Found the webhook secret had been rotated in NovaPulse but not updated in GitHub.",
+    "resolution": "Customer regenerated the webhook secret under Project Settings > Integrations > GitHub, then updated the secret in GitHub repository Settings > Webhooks. Pipelines triggered correctly on the next push. Documented the webhook rotation procedure in the customer's runbook.",
+    "resolution_type": "configuration_fix"
+  },
+  {
+    "ticket_id": "TKT-1005",
+    "department": "Returns & Refunds",
+    "summary": "Duplicate charge on annual renewal — charged twice in one day",
+    "thread": "Customer noticed two identical charges of $2,388 on their credit card on the same day. Investigation found the renewal job had fired twice due to a transient database error that caused the idempotency check to fail. Both charges were captured by the payment processor.",
+    "resolution": "Confirmed duplicate charge in payment processor logs. Issued full refund of $2,388 to the customer's card. Refund processed within 2 business days. Engineering team patched the renewal idempotency logic (incident INC-2024-0441). Customer received a credit note for records.",
+    "resolution_type": "full_refund"
+  },
+  {
+    "ticket_id": "TKT-1006",
+    "department": "Technical Support",
+    "summary": "Deployment failing with 'SecretNotFound: DATABASE_URL' after project migration",
+    "thread": "Customer migrated their project from Organization A to Organization B. After migration, all deployments failed at the secret injection step with `SecretNotFound: DATABASE_URL`. Investigation showed secrets are scoped to organizations and are not transferred during project migrations.",
+    "resolution": "Customer re-created the required secrets (DATABASE_URL, REDIS_URL, STRIPE_SECRET_KEY) in the new organization's project settings. Deployments resumed successfully. Added a pre-migration checklist to the docs that includes secrets re-creation as a required step.",
+    "resolution_type": "user_education"
+  },
+  {
+    "ticket_id": "TKT-1007",
+    "department": "Technical Support",
+    "summary": "Build times increased 4x after upgrading to multi-repo setup",
+    "thread": "Customer restructured their monolith into 5 microservice repos. Total build time went from 12 minutes to 48+ minutes. Each repo was running full test suites even for unrelated changes. Customer asked if there was a way to run only affected services.",
+    "resolution": "Configured path-based filtering in each repo's `novapulse.yml` using `on.push.paths` to trigger only when relevant directories changed. Also enabled distributed caching across repos using a shared `cache.key` prefix. Total build time reduced to 14 minutes for full cross-repo changes, under 5 minutes for single-service changes.",
+    "resolution_type": "optimization"
+  },
+  {
+    "ticket_id": "TKT-1008",
+    "department": "Billing & Payments",
+    "summary": "Customer needs invoice with EU VAT number for reimbursement",
+    "thread": "Customer in Germany needed their invoices to include their company EU VAT number (DE123456789) for expense reporting. The billing system was not displaying it despite being entered in their profile.",
+    "resolution": "Found the VAT number had been entered without the country prefix in the billing profile. Corrected the entry to `DE123456789`. Regenerated the last 3 invoices with the correct VAT number and emailed them to the customer. VAT now appears correctly on all future invoices.",
+    "resolution_type": "account_update"
+  },
+  {
+    "ticket_id": "TKT-1009",
+    "department": "Technical Support",
+    "summary": "SSH deploy key giving 'Permission denied' on private repo clone",
+    "thread": "Customer's pipeline was failing when trying to clone a private Git submodule during build. Error: `git@github.com: Permission denied (publickey)`. The main repository was cloned fine but the submodule used a different GitHub account.",
+    "resolution": "Customer added a second deploy key for the submodule repository and stored the private key as a NovaPulse secret. Updated `novapulse.yml` to configure the SSH agent to load both keys before the clone step. Submodule cloning succeeded on the next run.",
+    "resolution_type": "configuration_fix"
+  },
+  {
+    "ticket_id": "TKT-1010",
+    "department": "General Inquiry",
+    "summary": "Enterprise customer requesting SOC 2 report for vendor assessment",
+    "thread": "Customer's security team needed NovaPulse's SOC 2 Type II report as part of their vendor due diligence process. They also requested penetration test results and the data processing addendum (DPA).",
+    "resolution": "Shared SOC 2 Type II report, most recent penetration test executive summary, and the standard DPA via the NovaPulse Trust Center at trust.novapulse.io. Customer required NDA to access the full pen test report — CSM facilitated the NDA signature and provided access within 1 business day.",
+    "resolution_type": "documentation_provided"
+  },
+  {
+    "ticket_id": "TKT-1011",
+    "department": "Technical Support",
+    "summary": "Pipeline artifacts not being retained between stages",
+    "thread": "Customer's `build` stage produced a compiled binary but the `deploy` stage could not find it. Each stage was pulling a fresh workspace without the artifact from the previous stage.",
+    "resolution": "Instructed customer to use the `artifacts` keyword in `novapulse.yml` to declare outputs from the build stage. Added `artifacts.paths: ['dist/']` to the build job and `artifacts.dependencies: [build]` to the deploy job. Artifact sharing worked correctly on the next run.",
+    "resolution_type": "configuration_fix"
+  },
+  {
+    "ticket_id": "TKT-1012",
+    "department": "Returns & Refunds",
+    "summary": "Startup closing down — requesting refund for unused months of annual plan",
+    "thread": "Customer notified support that their startup was shutting down with 7 months remaining on their annual plan ($199/month = $1,393 remaining). They requested a refund per the annual plan refund policy.",
+    "resolution": "Verified shutdown documentation provided by customer. Applied prorated refund for 7 months minus 10% admin fee: (7 × $199) × 0.9 = $1,253.70. Refund issued to original payment method within 5 business days. Account data export link sent. Account scheduled for deletion in 30 days.",
+    "resolution_type": "prorated_refund"
+  },
+  {
+    "ticket_id": "TKT-1013",
+    "department": "Technical Support",
+    "summary": "SAML SSO login failing after IdP certificate renewal",
+    "thread": "Enterprise customer's team members could not log in via SSO after their IT team renewed the SAML signing certificate in Okta. Error: `SAML signature verification failed`. The old certificate was still configured in NovaPulse.",
+    "resolution": "Customer uploaded the new Okta SAML signing certificate under Settings > Security > SSO Configuration > Update Certificate. SSO logins resumed immediately after saving. Recommended customer set a calendar reminder 30 days before future certificate expiry to update NovaPulse proactively.",
+    "resolution_type": "configuration_fix"
+  },
+  {
+    "ticket_id": "TKT-1014",
+    "department": "Technical Support",
+    "summary": "Docker layer caching not working — full image rebuilt every run",
+    "thread": "Customer reported build times of 18–22 minutes due to Docker layers not being cached between runs. They had `cache.paths` configured but Docker pull was always starting from scratch.",
+    "resolution": "The customer was using `docker build` directly. NovaPulse's path cache doesn't apply to Docker layer cache. Instructed customer to enable BuildKit layer caching by setting `DOCKER_BUILDKIT=1` and adding `--cache-from` flags pointing to their registry. After switching to registry-backed layer caching, build times dropped to 4–6 minutes.",
+    "resolution_type": "optimization"
+  },
+  {
+    "ticket_id": "TKT-1015",
+    "department": "Order Tracking",
+    "summary": "Enterprise renewal delayed — waiting on legal review of updated MSA terms",
+    "thread": "Customer's contract was up for renewal. NovaPulse updated the MSA with new data processing clauses for GDPR compliance. Customer's legal team needed 3 weeks to review. Service was at risk of lapsing.",
+    "resolution": "Extended the current contract by 30 days on existing terms at no charge while legal review was completed. Provided redline-friendly MSA in Word format to expedite customer legal review. Customer signed the updated MSA within 18 days. New contract activated without service interruption.",
+    "resolution_type": "contract_extension"
+  }
+]

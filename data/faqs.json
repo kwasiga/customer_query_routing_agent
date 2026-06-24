@@ -1,0 +1,102 @@
+[
+  {
+    "department": "Technical Support",
+    "question": "Why is my deployment pipeline stuck in a pending state?",
+    "answer": "A stuck pipeline is usually caused by an unavailable runner, a misconfigured environment variable, or a dependency timeout. Go to Pipelines > select the run > click 'View Logs' to identify the failing step. If the runner is offline, navigate to Settings > Runners and restart it. For dependency timeouts, increase the timeout value in your novapulse.yml under `job_timeout_minutes`."
+  },
+  {
+    "department": "Technical Support",
+    "question": "How do I connect my AWS account to NovaPulse?",
+    "answer": "Go to Integrations > Cloud Providers > AWS. Click 'Add Account' and follow the IAM role creation wizard — it generates a CloudFormation template you deploy in your AWS console. Once the role is created, paste the Role ARN back into NovaPulse and click 'Verify'. The connection is read-write scoped to resources tagged with `novapulse:managed=true`."
+  },
+  {
+    "department": "Technical Support",
+    "question": "My Kubernetes cluster metrics are not showing up on the dashboard.",
+    "answer": "Metrics require the NovaPulse Agent to be installed in your cluster. Run `helm install novapulse-agent novapulse/agent --namespace monitoring --create-namespace --set apiKey=<YOUR_API_KEY>`. After installation, metrics appear within 5–10 minutes. If they still don't show, confirm the agent pod is Running: `kubectl get pods -n monitoring`. Firewall rules must allow outbound HTTPS to `ingest.novapulse.io:443`."
+  },
+  {
+    "department": "Technical Support",
+    "question": "How do I set up environment-specific secrets?",
+    "answer": "Navigate to your Project > Settings > Secrets. Click 'New Secret', enter the key and value, and select the environment scope (Development, Staging, Production). Secrets are encrypted at rest using AES-256 and injected as environment variables at runtime. You can reference them in `novapulse.yml` as `${{ secrets.MY_SECRET_KEY }}`."
+  },
+  {
+    "department": "Technical Support",
+    "question": "Can I run NovaPulse pipelines on self-hosted runners?",
+    "answer": "Yes. Go to Settings > Runners > Add Runner. Download the runner binary for your OS, run the install script with your registration token, and the runner will appear as available in your project. Self-hosted runners are useful for builds that require access to internal networks or specific hardware."
+  },
+  {
+    "department": "Technical Support",
+    "question": "Why did my container build fail with 'out of memory'?",
+    "answer": "The default build memory limit is 2 GB. For memory-intensive builds (large Docker images, monorepos), increase the limit in your novapulse.yml: set `resources.memory: 4096` under the relevant job. Alternatively, optimize your Dockerfile by using multi-stage builds to reduce intermediate layer sizes."
+  },
+  {
+    "department": "Billing & Payments",
+    "question": "What happens if my usage exceeds my plan limits?",
+    "answer": "If you exceed your monthly compute minutes or seat limit, NovaPulse sends an email alert at 80% and 100% usage. Pipeline runs will continue but you will be charged overage at the rate listed on our Pricing page (typically $0.008 per compute minute). You will not be cut off mid-run. To avoid overages, upgrade your plan or purchase a compute add-on under Billing > Add-ons."
+  },
+  {
+    "department": "Billing & Payments",
+    "question": "How do I update my payment method?",
+    "answer": "Go to Settings > Billing > Payment Methods. Click 'Add Payment Method', enter your new card details, and set it as the default. Your old card will be removed from the next billing cycle. We accept Visa, Mastercard, American Express, and ACH bank transfers for annual plans."
+  },
+  {
+    "department": "Billing & Payments",
+    "question": "Can I get a refund if I cancel mid-cycle?",
+    "answer": "Monthly plans are non-refundable for the current billing period but you will not be charged for the next cycle after cancellation. Annual plans are eligible for a prorated refund for unused months minus a 10% processing fee. To request a refund, contact billing@novapulse.io with your account ID and cancellation date."
+  },
+  {
+    "department": "Billing & Payments",
+    "question": "How do I get an invoice for my company?",
+    "answer": "Invoices are automatically generated on each billing date and sent to the billing email on file. You can also download past invoices under Settings > Billing > Invoice History. To add a PO number or company name to future invoices, update your billing details at Settings > Billing > Company Info."
+  },
+  {
+    "department": "Returns & Refunds",
+    "question": "I was charged twice this month. What should I do?",
+    "answer": "Duplicate charges can occur if a payment fails and is retried against a second payment method. Check Settings > Billing > Payment History for duplicate entries. If confirmed, email billing@novapulse.io with your account ID and transaction dates — we will issue a credit or refund within 3 business days."
+  },
+  {
+    "department": "Returns & Refunds",
+    "question": "How do I cancel my NovaPulse subscription?",
+    "answer": "Go to Settings > Billing > Plan, scroll to the bottom, and click 'Cancel Subscription'. You will be asked to confirm and optionally provide cancellation feedback. Your account remains active until the end of the current billing period. Data is retained for 30 days post-cancellation, after which it is permanently deleted."
+  },
+  {
+    "department": "Order Tracking",
+    "question": "How do I track the status of my enterprise contract renewal?",
+    "answer": "Enterprise contract renewals are managed by your dedicated Customer Success Manager. You will receive a renewal proposal 60 days before your contract end date. Track renewal status and sign documents through the NovaPulse Enterprise Portal at enterprise.novapulse.io. If you don't have portal access, contact your CSM or email enterprise@novapulse.io."
+  },
+  {
+    "department": "Order Tracking",
+    "question": "When will my requested support tier upgrade take effect?",
+    "answer": "Support tier upgrades requested before the 15th of the month take effect on the 1st of the following month. Requests after the 15th take effect the month after that. You will receive a confirmation email with the exact activation date. For urgent upgrades, contact sales@novapulse.io."
+  },
+  {
+    "department": "General Inquiry",
+    "question": "What compliance certifications does NovaPulse hold?",
+    "answer": "NovaPulse is SOC 2 Type II certified, ISO 27001 certified, and GDPR compliant. We also offer a Business Associate Agreement (BAA) for customers handling HIPAA-regulated data on our Enterprise plan. Certification reports are available under Settings > Security & Compliance or upon request for enterprise customers."
+  },
+  {
+    "department": "General Inquiry",
+    "question": "Does NovaPulse support multi-region deployments?",
+    "answer": "Yes. NovaPulse supports deployment to US East, US West, EU West (Frankfurt), and Asia Pacific (Singapore). Region selection is configured per environment under Project > Environments > Edit. Enterprise customers can also request private single-tenant deployments in additional regions."
+  },
+  {
+    "department": "General Inquiry",
+    "question": "What is the SLA for NovaPulse uptime?",
+    "answer": "NovaPulse guarantees 99.9% uptime for Growth and Pro plans and 99.99% for Enterprise plans, measured monthly. In the event of an SLA breach, customers are eligible for service credits (10% of monthly fee per 0.1% below the SLA). Submit SLA credit requests within 30 days of the incident to support@novapulse.io."
+  },
+  {
+    "department": "Technical Support",
+    "question": "How do I roll back a failed deployment?",
+    "answer": "Open the Deployments tab in your project, find the deployment you want to roll back to, and click 'Redeploy'. NovaPulse keeps the last 10 successful deployment artifacts by default (configurable up to 50 under Project Settings > Artifacts). Rollbacks typically complete within 2–3 minutes depending on your stack size."
+  },
+  {
+    "department": "Technical Support",
+    "question": "Why is my GitHub webhook not triggering pipelines?",
+    "answer": "Check that the webhook is active under your GitHub repository Settings > Webhooks. The payload URL should be `https://hooks.novapulse.io/github/<your-project-id>`. Ensure the 'Push' and 'Pull Request' events are checked. If the webhook is active but pipelines aren't triggering, check the webhook delivery logs in GitHub for any 4xx/5xx responses, then verify your project's branch filter settings in NovaPulse."
+  },
+  {
+    "department": "General Inquiry",
+    "question": "Can I use NovaPulse with GitLab or Bitbucket?",
+    "answer": "Yes, NovaPulse supports GitHub, GitLab (Cloud and Self-Managed), and Bitbucket. Connect your VCS provider under Settings > Integrations > Source Control. For GitLab Self-Managed, you will need to provide your instance URL and a personal access token with `api` and `read_repository` scopes."
+  }
+]

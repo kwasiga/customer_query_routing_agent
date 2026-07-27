@@ -82,3 +82,6 @@ docker-compose.override.yml
 
 # VectorAI persistent data
 local_data/
+
+# Downloaded local LLM weights
+models/

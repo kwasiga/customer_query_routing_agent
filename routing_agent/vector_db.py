@@ -38,10 +38,13 @@ from routing_agent.config import (
 def get_client() -> VectorAIClient:
     # Builds a VectorAIClient using the URL and optional access token from config.
     # Only passes the token if one is set — avoids sending a None value to the client.
+    # connect() establishes the gRPC channel; the client is unusable without it.
     kwargs: dict = {"url": VECTORAI_URL}
     if VECTORAI_ACCESS_TOKEN:
         kwargs["access_token"] = VECTORAI_ACCESS_TOKEN
-    return VectorAIClient(**kwargs)
+    client = VectorAIClient(**kwargs)
+    client.connect()
+    return client
 
 
 def init_collections(client: VectorAIClient) -> None:

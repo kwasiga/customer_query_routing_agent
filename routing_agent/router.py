@@ -2,16 +2,20 @@
 #
 # Core routing logic for the customer query agent.
 # Takes a raw customer query, searches all 4 VectorAI collections for relevant context,
-# and returns a unified list of ranked documents to pass to the LLM.
+# and returns a unified, ranked RoutingResult to pass down the pipeline.
 # Contains:
+#   - RoutingResult       : department + ranked context docs returned by route()
 #   - SOURCE_LABELS       : human-readable labels for each data source
 #   - _hits_to_docs()     : converts raw VectorAI search hits into a standard dict format
-#   - route()             : embeds the query, searches all collections, returns context docs
+#   - route()             : embeds the query, searches all collections, returns a RoutingResult
 
 from __future__ import annotations
 
+from dataclasses import dataclass
+
 from actian_vectorai import VectorAIClient
 
+from routing_agent.config import DEPARTMENTS
 from routing_agent.embedder import Embedder
 from routing_agent.vector_db import (
     search_docs,
@@ -27,6 +31,15 @@ SOURCE_LABELS = {
     "tickets": "Past Ticket",
     "memory": "Agent Memory",
 }
+
+# Fallback department when no context doc carries one (e.g. no matches found at all)
+DEFAULT_DEPARTMENT = DEPARTMENTS[-1]
+
+
+@dataclass
+class RoutingResult:
+    department: str
+    context_docs: list[dict]
 
 
 def _hits_to_docs(hits: list, source_key: str) -> list[dict]:
@@ -50,9 +63,10 @@ def _hits_to_docs(hits: list, source_key: str) -> list[dict]:
     return docs
 
 
-def route(query: str, client: VectorAIClient, embedder: Embedder) -> list[dict]:
+def route(query: str, client: VectorAIClient, embedder: Embedder) -> RoutingResult:
     # Embeds the customer query and searches all 4 collections in parallel.
-    # Returns a combined list of context documents sorted by relevance score.
+    # Returns a RoutingResult: the department of the top-scoring match, plus
+    # all context documents sorted by relevance score.
     query_vector = embedder.embed(query)
 
     faq_hits = search_faqs(client, query_vector, top_k=3)
@@ -66,5 +80,7 @@ def route(query: str, client: VectorAIClient, embedder: Embedder) -> list[dict]:
         + _hits_to_docs(ticket_hits, "tickets")
         + _hits_to_docs(memory_hits, "memory")
     )
+    all_docs.sort(key=lambda d: d["score"], reverse=True)
 
-    return sorted(all_docs, key=lambda d: d["score"], reverse=True)
+    department = all_docs[0]["department"] if all_docs else DEFAULT_DEPARTMENT
+    return RoutingResult(department=department, context_docs=all_docs)

@@ -25,6 +25,15 @@ Customer Query
                           so the human agent has full context when they pick it up
 ```
 
+## Tech stack
+
+| Layer | Technology |
+|---|---|
+| Embeddings | `sentence-transformers/all-MiniLM-L6-v2` |
+| Vector database | Actian VectorAI (self-hosted via Docker) |
+| LLM | Mistral 7B Instruct v0.2 (local inference via `llama-cpp-python`) |
+| Language | Python 3.10+ |
+
 ## Knowledge sources
 
 | Collection | Contents |
@@ -38,11 +47,13 @@ Customer Query
 
 ```
 routing_agent/
-  config.py       # All settings loaded from .env
-  embedder.py     # Wraps sentence-transformers for text → vector conversion
-  vector_db.py    # All VectorAI interactions (client, collections, search, memory)
-  router.py       # Retrieval layer — searches all collections and ranks results
-  models.py       # Shared data models
+  config.py        # All settings loaded from .env
+  embedder.py      # Wraps sentence-transformers for text → vector conversion
+  vector_db.py     # All VectorAI interactions (client, collections, search, memory)
+  router.py        # Retrieval layer — searches all collections, returns a RoutingResult
+  orchestrator.py  # Triage agent — rule-based auto-resolve vs. escalate decision
+  resolver.py      # Resolution + escalation agents (LLM generation via llama-cpp-python)
+  models.py        # Shared data models
 
 data/
   faqs.json       # Product FAQ entries
@@ -80,9 +91,15 @@ The defaults in `.env.example` work out of the box for local Docker. No access t
 docker-compose up -d
 ```
 
-**4. Seed the database**
+**4. Run the app**
 
-On first run, load the static knowledge sources into VectorAI:
+```bash
+streamlit run app.py
+```
+
+On startup, the app loads the embedder and LLM, then initializes and seeds the VectorAI collections from `data/` — safe to run every time, since seeding is idempotent. On first run, this also downloads the ~4.4GB quantized Mistral model to `./models`.
+
+To seed the database outside the app (e.g. for scripting), call the same functions directly:
 
 ```python
 from routing_agent.vector_db import get_client, init_collections, seed_collections
@@ -94,8 +111,6 @@ client = get_client()
 init_collections(client)
 seed_collections(client, embedder)
 ```
-
-This is idempotent — safe to call on every startup.
 
 ## Embedding model
 

@@ -2,6 +2,14 @@
 
 An autonomous customer support pipeline that routes incoming queries through retrieval, triage, and response generation — resolving what it can automatically and escalating everything else with a warm handoff.
 
+<img width="1504" height="733" alt="Screenshot 2026-07-27 at 11 46 09 AM" src="https://github.com/user-attachments/assets/4b3add41-a7b0-4502-ae35-f4f9b8c9e687" />
+<img width="1502" height="617" alt="Screenshot 2026-07-27 at 11 46 23 AM" src="https://github.com/user-attachments/assets/49bde5ca-758c-4b1d-a568-dce56b915fac" />
+
+
+
+
+
+
 ## Pipeline
 
 ```

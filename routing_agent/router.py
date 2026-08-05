@@ -15,7 +15,7 @@ from dataclasses import dataclass
 
 from actian_vectorai import VectorAIClient
 
-from routing_agent.config import DEPARTMENTS
+from routing_agent.config import DEPARTMENTS, RESOLUTION_CONFIDENCE_THRESHOLD
 from routing_agent.embedder import Embedder
 from routing_agent.vector_db import (
     search_docs,
@@ -82,5 +82,10 @@ def route(query: str, client: VectorAIClient, embedder: Embedder) -> RoutingResu
     )
     all_docs.sort(key=lambda d: d["score"], reverse=True)
 
-    department = all_docs[0]["department"] if all_docs else DEFAULT_DEPARTMENT
+    # Only trust the top match's department when it's actually a confident
+    # match — below threshold it's noise, not a real signal of which team owns this.
+    if all_docs and all_docs[0]["score"] >= RESOLUTION_CONFIDENCE_THRESHOLD:
+        department = all_docs[0]["department"]
+    else:
+        department = DEFAULT_DEPARTMENT
     return RoutingResult(department=department, context_docs=all_docs)
